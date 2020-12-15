@@ -23,7 +23,23 @@ const searchMeal = async (e) => {
       const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${term}`);
       console.log(response);
       const data = await response.json();
-      console.log(data);
+      const mealsArr = data.meals;
+
+      // We are rendering the divs of a single meal inside the meals container
+      myDOM.mealsEl.innerHTML = mealsArr
+        .map((currentMealObj) => {
+          return `
+        <div class="meal">
+          <img src="${currentMealObj.strMealThumb}" alt="${currentMealObj.strMeal}"/>
+          <div class="meal-info" data-mealID="${currentMealObj.idMeal}">
+            <a href="#single-meal-info">${currentMealObj.strMeal}</a>
+          </div>
+        </div>`;
+        })
+        // If we don't put .join(""), it still renders, but the markup is still weird because it is still an array (you'll notice the commas). So we have to append the join() to form the array to a string. if you want to test, console.log myDOM.mealsEl with the join() and without it, and go to the console and see the difference
+        .join("");
+
+      console.log(myDOM.mealsEl);
     } catch (error) {
       console.log(`Error fetching meals: ${error}`);
     } finally {
