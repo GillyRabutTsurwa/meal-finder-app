@@ -1,5 +1,3 @@
-// This branch is the same as the previous one, but using async/await instead of fetch
-// A more detailed notes are in branch 2-fetching-meals-using-API, because they are the same, except for the implementation of async/await on this one and .then() on that one. Thus, I deleted all duplicate notes.
 const myDOM = (function () {
   const elements = {
     search: document.getElementById("search"),
@@ -12,10 +10,19 @@ const myDOM = (function () {
   return elements;
 })();
 
-// fetch all meals based on submission of input
+// =================================== UI Rendering FUNCTIONS ===================================
+const makeMealCard = (mealImage, mealName, mealID) => {
+  return `
+  <div class="meal">
+    <img src="${mealImage}" alt="${mealName}"/>
+    <div class="meal-info" data-mealID="${mealID}">
+      <a href="#single-meal-info">${mealName}</a>
+    </div>
+  </div>`;
+};
+
 const searchMeal = async (e) => {
   e.preventDefault();
-
   const term = myDOM.search.value;
 
   if (term.trim()) {
@@ -25,20 +32,21 @@ const searchMeal = async (e) => {
       const data = await response.json();
       const mealsArr = data.meals;
 
-      // We are rendering the divs of a single meal inside the meals container
+      //NEW:
+      let mealExistsMsg = `<h2>Search Results for: ${term}</h2>`;
+      let mealDoesntExistMsg = `<p>There are no search results for ${term}. Try Again</p>`;
+      myDOM.resultHeading.innerHTML = data.meals !== null ? mealExistsMsg : mealDoesntExistMsg;
+
       myDOM.mealsEl.innerHTML = mealsArr
         .map((currentMealObj) => {
-          return `
-        <div class="meal">
-          <img src="${currentMealObj.strMealThumb}" alt="${currentMealObj.strMeal}"/>
-          <div class="meal-info" data-mealID="${currentMealObj.idMeal}">
-            <a href="#single-meal-info">${currentMealObj.strMeal}</a>
-          </div>
-        </div>`;
+          // Here was are using destructuring to extract the object properties that we need
+          let { strMealThumb, strMeal, idMeal } = currentMealObj;
+          // And we are using thouse in our makeMealCard().
+          // This makeMealCard() returns the markup that we have been using
+          // So it's the samething as last time. We are just returning a function that returns the markup
+          return makeMealCard(strMealThumb, strMeal, idMeal);
         })
-        // If we don't put .join(""), it still renders, but the markup is still weird because it is still an array (you'll notice the commas). So we have to append the join() to form the array to a string. if you want to test, console.log myDOM.mealsEl with the join() and without it, and go to the console and see the difference
         .join("");
-
       console.log(myDOM.mealsEl);
     } catch (error) {
       console.log(`Error fetching meals: ${error}`);
@@ -47,13 +55,11 @@ const searchMeal = async (e) => {
     }
   } else {
     alert("Hakuna kitu was typed");
-    // For the LOLs
-    let blankInputMsg = confirm("Anyways, is Gilbert the best chef?");
-    blankInputMsg ? console.log("Yes. You damn right") : console.log("Wrong. No");
   }
 };
 
 // Fetch random meal
+// We will refactor this code later on after putting in the logic
 const getRandomMeal = async () => {
   try {
     const response = await fetch(`https://www.themealdb.com/api/json/v1/1/random.php`);
