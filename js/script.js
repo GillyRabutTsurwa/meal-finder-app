@@ -21,6 +21,28 @@ const makeMealCard = (mealImage, mealName, mealID) => {
   </div>`;
 };
 
+// QUESTION: the parametres for this function are too many, puis-je le réparer dans à venir ?
+
+const renderRandomMeal = (mealName, mealImage, mealCategory, mealOrigin, mealInstructions, ingredientsArr) => {
+  return `
+  <div id="single-meal-info" class="single-meal">
+    <h1>${mealName}</h1>
+    <img src="${mealImage}"/>
+    <div class="single-meal-info">
+      ${mealCategory ? `<p>${mealCategory}</p>` : ""}
+      ${mealOrigin ? `<p>${mealOrigin}</p>` : ""}
+    </div>
+    <div class="main">
+      <p>${mealInstructions}</p>
+      <h2>Ingredients</h2>
+      <ul>
+        ${ingredientsArr.map((currentIngredient) => `<li>${currentIngredient}</li>`).join("")}
+      </ul>
+    </div>
+  </div>
+  `;
+};
+
 const searchMeal = async (e) => {
   e.preventDefault();
   const term = myDOM.search.value;
@@ -32,7 +54,6 @@ const searchMeal = async (e) => {
       const data = await response.json();
       const mealsArr = data.meals;
 
-      //NEW:
       let mealExistsMsg = `<h2>Search Results for: ${term}</h2>`;
       let mealDoesntExistMsg = `<p>There are no search results for ${term}. Try Again</p>`;
       myDOM.resultHeading.innerHTML = data.meals !== null ? mealExistsMsg : mealDoesntExistMsg;
@@ -41,7 +62,7 @@ const searchMeal = async (e) => {
         let { strMealThumb, strMeal, idMeal } = currentMealObj;
         return makeMealCard(strMealThumb, strMeal, idMeal);
       });
-      // NOTE: just making it to another variable (mealsArrTemplate). Still same code base
+
       myDOM.mealsEl.innerHTML = mealsArrTemplate.join("");
       console.log(myDOM.mealsEl);
     } catch (error) {
@@ -69,43 +90,23 @@ const getRandomMeal = async () => {
     console.log(meal);
 
     const { idMeal, strMeal, strMealThumb, strCategory, strArea, strInstructions } = meal;
-
     // I will put this in (a) separate function(s)
     const ingredients = [];
+    const ingredientLimit = 20; // made a variable for the limit of the for-loop. small minour change.
+    // making some of these variables into an array that i will use in the renderRandomMeal() call in line 08. Just to make things look a bit cleaner
+    // I'm this code here specifically because I need to access ingredients and I can't do it before initialisation (the name of the error when I tried to put it above)
+    const renderRandomMealArgs = [strMeal, strMealThumb, strCategory, strArea, strInstructions, ingredients];
 
-    for (let i = 1; i <= 20; i++) {
-      // I'm not destructuring these
-      // NOTE: if the current meal ingredient property exists / does not equate to an empty string (I'm assuming an empty string is false)
+    for (let i = 1; i <= ingredientLimit; i++) {
       if (meal[`strIngredient${i}`]) {
-        // push the value of the meal ingredient property and the meal measurements property
-        // this is beacause they both have 20 and they both coorelate to one another
-        // so if meal[strIngredient1] = sugar and meal[strMeasure1] = sugar. This is translates to 1 cup of sugar.
-        // Also, if a particular meal only has 14 ingredients, it will consequently only have 14 measurements as well. This is why we are breaking once we start finding empty ingredients and measurement values.
-        //console.log the fetch data if this is still confusing. You will see these properties
         ingredients.push(`${meal[`strIngredient${i}`]} - ${meal[`strMeasure${i}`]}`);
       } else {
         break;
       }
     }
 
-    // UI markup ici. will put it into its own UI function in the next branch
-    myDOM.single_mealEl.innerHTML = `
-    <div id="single-meal-info" class="single-meal">
-      <h1>${strMeal}</h1>
-      <img src="${strMealThumb}"/>
-      <div class="single-meal-info">
-        ${strCategory ? `<p>${strCategory}</p>` : ""}
-        ${strArea ? `<p>${strArea}</p>` : ""}
-      </div>
-      <div class="main">
-        <p>${strInstructions}</p>
-        <h2>Ingredients</h2>
-        <ul>
-          ${ingredients.map((currentIngredient) => `<li>${currentIngredient}</li>`).join("")}
-        </ul>
-      </div>
-    </div>
-  `;
+    myDOM.single_mealEl.innerHTML = renderRandomMeal(...renderRandomMealArgs);
+
     console.log(ingredients);
     console.log(`ID # of the meal is ${idMeal}`);
     console.log(`The name of this meal is ${strMeal}`);
