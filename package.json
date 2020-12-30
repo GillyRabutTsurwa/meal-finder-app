@@ -1,0 +1,23 @@
+{
+  "name": "meal-finder-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "terser": "terser --compress -- js/script.js > js/ojala.js",
+    "bigTings": "terser js/script.js --compress --output js/bigTings.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GillyRabutTsurwa/meal-finder-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GillyRabutTsurwa/meal-finder-app/issues"
+  },
+  "homepage": "https://github.com/GillyRabutTsurwa/meal-finder-app#readme"
+}
