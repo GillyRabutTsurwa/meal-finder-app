@@ -21,8 +21,6 @@ const makeMealCard = (mealImage, mealName, mealID) => {
   </div>`;
 };
 
-// QUESTION: the parametres for this function are too many, puis-je le réparer dans à venir ?
-
 const renderRandomMeal = (mealName, mealImage, mealCategory, mealOrigin, mealInstructions, ingredientsArr) => {
   return `
   <div id="single-meal-info" class="single-meal">
@@ -75,26 +73,22 @@ const searchMeal = async (e) => {
   }
 };
 
-// Fetch random meal
-// We will refactor this code later on after putting in the logic
 const getRandomMeal = async () => {
-  // clear previous meals and headings; the ones already painted to the DOM
   myDOM.mealsEl.innerHTML = "";
   myDOM.resultHeading.innerHTML = "";
   try {
     const response = await fetch(`https://www.themealdb.com/api/json/v1/1/random.php`);
     const data = await response.json();
     console.log(data);
-    // NOTE: this is an array with one object containing all our info. a bit unorthodox mais its ok
+
     const meal = data.meals[0];
     console.log(meal);
 
     const { idMeal, strMeal, strMealThumb, strCategory, strArea, strInstructions } = meal;
-    // I will put this in (a) separate function(s)
+    // ? QUESTION: Should I put this (code in lines 92-100) in (a) separate function(s)
     const ingredients = [];
-    const ingredientLimit = 20; // made a variable for the limit of the for-loop. small minour change.
-    // making some of these variables into an array that i will use in the renderRandomMeal() call in line 08. Just to make things look a bit cleaner
-    // I'm this code here specifically because I need to access ingredients and I can't do it before initialisation (the name of the error when I tried to put it above)
+    const ingredientLimit = 20;
+
     const renderRandomMealArgs = [strMeal, strMealThumb, strCategory, strArea, strInstructions, ingredients];
 
     for (let i = 1; i <= ingredientLimit; i++) {
@@ -106,16 +100,10 @@ const getRandomMeal = async () => {
     }
 
     myDOM.single_mealEl.innerHTML = renderRandomMeal(...renderRandomMealArgs);
-
-    console.log(ingredients);
-    console.log(`ID # of the meal is ${idMeal}`);
-    console.log(`The name of this meal is ${strMeal}`);
-    console.log(`The type of dish is ${strCategory}`);
-    console.log(`The origin of this meal is ${strArea}`);
   } catch (error) {
-    console.log(`Error fetching random meal: ${error}`);
+    console.warn(`Error fetching random meal: ${error}`);
   } finally {
-    console.log("There's your rando,.. chicken like rambo");
+    console.log("I will have better functionality for this finally block");
   }
 };
 
