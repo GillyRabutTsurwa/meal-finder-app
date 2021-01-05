@@ -107,5 +107,42 @@ const getRandomMeal = async () => {
   }
 };
 
+//NEW: fetching meal by id
+const getMealByID = async (mealID) => {
+  const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealID}`);
+  const data = await response.json();
+
+  const meal = data.meals[0];
+  console.log(meal);
+};
+
 myDOM.submit.addEventListener("submit", searchMeal);
 myDOM.random.addEventListener("click", getRandomMeal);
+
+// NEW: event listener of fetching meal by ID. It's a bit convoluted
+//NOTE: Reminder mealsEl element is the container holding all the meals
+myDOM.mealsEl.addEventListener("click", (e) => {
+  const mealInfoPath = e.path; //NEW: an ARRAY with the path from the target element, all the way up to the Window
+  console.log(mealInfoPath); // logging for the lols
+
+  // NOTE: we are looping through that path array
+  const mealInfo = mealInfoPath.find((currentElement) => {
+    // if the current element being looped through contains a class, any class
+    if (currentElement.classList) {
+      // then give us the element that has the class "meal-info"
+      return currentElement.classList.contains("meal-info");
+    }
+    // otherwise, return false
+    else {
+      return false;
+    }
+  });
+  console.log(mealInfo);
+  // and theeeen
+  // if mealInfo did not give us undefined, that is, if we did have an element with the meal-info class
+  if (mealInfo) {
+    const mealID = mealInfo.getAttribute("data-mealid");
+    console.log(mealID);
+    getMealByID(mealID);
+  }
+});
