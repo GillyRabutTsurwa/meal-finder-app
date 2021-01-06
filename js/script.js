@@ -1,11 +1,14 @@
 const myDOM = (function () {
   const elements = {
-    search: document.getElementById("search"),
-    submit: document.getElementById("submit"),
-    random: document.getElementById("random"),
-    mealsEl: document.getElementById("meals"),
-    resultHeading: document.getElementById("result-heading"),
-    single_mealEl: document.getElementById("single-meal"),
+    search: document.querySelector("#search"),
+    submit: document.querySelector("#submit"),
+    random: document.querySelector("#random"),
+    mealsEl: document.querySelector("#meals"),
+    resultHeading: document.querySelector("#result-heading"),
+    single_mealEl: document.querySelector("#single-meal"),
+    //NEW:
+    toggler: document.querySelector("#toggle"),
+    body: document.querySelector("body"),
   };
   return elements;
 })();
@@ -107,14 +110,12 @@ const getRandomMeal = async () => {
   }
 };
 
-//NEW: fetching meal by id
 const getMealByID = async (mealID) => {
   const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealID}`);
   const data = await response.json();
   console.log(data);
   console.log(typeof data);
 
-  // NOTE: just like with the random meal data, data.meals is an array with one object containing all our info.
   const meal = data.meals[0];
   console.log(data.meals);
   console.log(meal);
@@ -123,31 +124,29 @@ const getMealByID = async (mealID) => {
 myDOM.submit.addEventListener("submit", searchMeal);
 myDOM.random.addEventListener("click", getRandomMeal);
 
-// NEW: event listener of fetching meal by ID. It's a bit convoluted
-//NOTE: Reminder mealsEl element is the container holding all the meals
 myDOM.mealsEl.addEventListener("click", (e) => {
-  const mealInfoPath = e.path; //NEW: an ARRAY with the path from the target element, all the way up to the Window
-  console.log(mealInfoPath); // logging for the lols
+  const mealInfoPath = e.path;
+  console.log(mealInfoPath);
 
-  // NOTE: we are looping through that path array
   const mealInfo = mealInfoPath.find((currentElement) => {
-    // if the current element being looped through contains a class, any class
     if (currentElement.classList) {
-      // then give us the element that has the class "meal-info"
       return currentElement.classList.contains("meal-info");
-    }
-    // otherwise, return false
-    else {
+    } else {
       return false;
     }
   });
   console.log(mealInfo);
-  // and theeeen
-  // if mealInfo did not give us undefined, that is, if we did have an element with the meal-info class
   if (mealInfo) {
-    // we are targeting the value of the attribute data-mealid. we created this in the markup for making a meal card (look @ line 18)
     const mealID = mealInfo.getAttribute("data-mealid");
     console.log(mealID);
     getMealByID(mealID);
   }
+});
+
+//NEW: event listener for dark mode.
+// not using an arrow function because I want to access this element object using this
+myDOM.toggler.addEventListener("click", function () {
+  console.dir(this);
+  this.classList.toggle("active");
+  myDOM.body.classList.toggle("dark");
 });
