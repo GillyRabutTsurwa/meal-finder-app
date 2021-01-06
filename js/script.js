@@ -15,7 +15,7 @@ const makeMealCard = (mealImage, mealName, mealID) => {
   return `
   <div class="meal">
     <img src="${mealImage}" alt="${mealName}"/>
-    <div class="meal-info" data-mealID="${mealID}">
+    <div class="meal-info" data-mealid="${mealID}">
       <a href="#single-meal-info">${mealName}</a>
     </div>
   </div>`;
@@ -111,8 +111,12 @@ const getRandomMeal = async () => {
 const getMealByID = async (mealID) => {
   const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealID}`);
   const data = await response.json();
+  console.log(data);
+  console.log(typeof data);
 
+  // NOTE: just like with the random meal data, data.meals is an array with one object containing all our info.
   const meal = data.meals[0];
+  console.log(data.meals);
   console.log(meal);
 };
 
@@ -141,6 +145,7 @@ myDOM.mealsEl.addEventListener("click", (e) => {
   // and theeeen
   // if mealInfo did not give us undefined, that is, if we did have an element with the meal-info class
   if (mealInfo) {
+    // we are targeting the value of the attribute data-mealid. we created this in the markup for making a meal card (look @ line 18)
     const mealID = mealInfo.getAttribute("data-mealid");
     console.log(mealID);
     getMealByID(mealID);
